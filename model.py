@@ -40,7 +40,8 @@ def build_model(args):
     """
     model = Sequential()
     model.add(Lambda(lambda x: x/127.5-1.0, input_shape=INPUT_SHAPE))
-    model.add(Conv2D(24, (5, 5), activation='relu', strides=(2, 2)))
+    #Convoultion layers
+    model.add(Conv2D(24, (5, 5), activation='relu', strides=(2, 2))) 
     model.add(BatchNormalization())
     model.add(Conv2D(36, (5, 5), activation='relu', strides=(2, 2)))
     model.add(BatchNormalization())
@@ -51,6 +52,7 @@ def build_model(args):
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(BatchNormalization())
     model.add(Flatten())
+    #Dense layers
     model.add(Dense(1164, activation='relu'))
     model.add(Dropout(args.keep_prob))
     model.add(Dense(100, activation='relu'))
@@ -119,13 +121,13 @@ def train_model(model, args, X_train, X_valid, y_train, y_valid):
     """
     Train the model
     """
-    checkpoint = ModelCheckpoint('model-v2-{epoch:03d}.h5',
-                                 monitor='val_loss',
-                                 verbose=0,
+    #Saves model’s weights during the training after a number of epochs and saves best model
+    checkpoint = ModelCheckpoint('model-{epoch:03d}.h5',monitor='val_loss',verbose=0,
                                  save_best_only=args.save_best_only,
                                  mode='auto')
-
+    #compile the model
     model.compile(loss='mean_squared_error', optimizer=Adam(learning_rate=args.learning_rate))
+    #train the model
     model.fit(batch_generator(args.data_dir, X_train, y_train, args.batch_size, True),
           steps_per_epoch=args.samples_per_epoch,
           epochs=args.nb_epoch,
@@ -145,8 +147,9 @@ def s2b(s):
 
 def main():
     """
-    Load train/validation data set and train the model
+    Load train/validation data set and train the model 
     """
+    # Arguments
     parser = argparse.ArgumentParser(description='Behavioral Cloning Training Program')
     parser.add_argument('-a', help='data directory',        dest='l2_reg',          type=float,   default=0.001)
     parser.add_argument('-d', help='data directory',        dest='data_dir',          type=str,   default='data')
